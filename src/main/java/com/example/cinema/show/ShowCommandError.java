@@ -1,0 +1,13 @@
+package com.example.cinema.show;
+
+public enum ShowCommandError {
+    NO_ERROR,
+    SHOW_ALREADY_EXISTS,
+    SHOW_NOT_FOUND,
+    TOO_MANY_SEATS,
+    SEAT_NOT_FOUND,
+    SEAT_NOT_AVAILABLE,
+    RESERVATION_NOT_FOUND,
+    DUPLICATED_COMMAND,
+    CANCELLING_CONFIRMED_RESERVATION
+}

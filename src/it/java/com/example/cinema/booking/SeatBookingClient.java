@@ -14,14 +14,14 @@ public class SeatBookingClient {
   private WebClient webClient;
 
   public CompletionStage<SeatBookingCommandResponse> start(String reservationId, String showId, int seatNumber, String walletId) {
-    return webClient.post().uri("/seat-reservation/" + reservationId)
+    return webClient.post().uri("/seat-booking/" + reservationId)
             .bodyValue(new SeatBookingCommand(showId,seatNumber,walletId))
             .retrieve()
             .bodyToMono(SeatBookingCommandResponse.class)
             .toFuture();
   }
   public CompletionStage<SeatBookingCommandResponse> get(String reservationId) {
-    return webClient.get().uri("/seat-reservation/" + reservationId)
+    return webClient.get().uri("/seat-booking/" + reservationId)
             .retrieve()
             .bodyToMono(SeatBookingCommandResponse.class)
             .toFuture();

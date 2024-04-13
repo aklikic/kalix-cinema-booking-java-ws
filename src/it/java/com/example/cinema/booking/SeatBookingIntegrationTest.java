@@ -1,10 +1,8 @@
 package com.example.cinema.booking;
 
 import com.example.cinema.Main;
-import com.example.cinema.show.ShowClient;
 import com.example.cinema.show.ShowCommandError;
 import com.example.cinema.show.ShowState;
-import com.example.cinema.wallet.WalletClient;
 import com.example.cinema.wallet.WalletCommandError;
 import kalix.spring.testkit.KalixIntegrationTestKitSupport;
 import org.junit.jupiter.api.Test;
@@ -22,16 +20,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import java.util.concurrent.TimeUnit;
 
 
-/**
- * This is a skeleton for implementing integration tests for a Kalix application built with the Java SDK.
- *
- * This test will initiate a Kalix Runtime using testcontainers and therefore it's required to have Docker installed
- * on your machine. This test will also start your Spring Boot application.
- *
- * Since this is an integration tests, it interacts with the application using a WebClient
- * (already configured and provided automatically through injection).
- */
-@DirtiesContext
+
 @SpringBootTest(classes = Main.class)
 public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
 

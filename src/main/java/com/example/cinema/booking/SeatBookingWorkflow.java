@@ -30,8 +30,8 @@ import static io.grpc.Status.Code.INVALID_ARGUMENT;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Id("id")
-@TypeId("seat-reservation")
-@RequestMapping("/seat-reservation/{id}")
+@TypeId("seat-booking")
+@RequestMapping("/seat-booking/{id}")
 public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
 
   public static final String RESERVE_SEAT_STEP = "reserve-seat";
@@ -54,7 +54,7 @@ public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
   public Effect<SeatBookingCommandResponse> start(@RequestBody SeatBookingCommand bookSeat) {
     logger.info("Start seat booking workflow");
     if (currentState() != null) {
-      return effects().error("seat reservation already exists", INVALID_ARGUMENT);
+      return effects().reply(SeatBookingCommandResponse.error(currentState(), SeatBookingCommandError.BOOKING_ALREADY_EXISTS));
     } else {
       var updatedState = SeatBookingState.of(reservationId(), bookSeat.showId(), bookSeat.seatNumber(), bookSeat.walletId());
       return effects()

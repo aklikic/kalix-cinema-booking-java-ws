@@ -1,11 +1,12 @@
-package com.example.cinema.wallet;
+package com.example.cinema.booking;
 
+import com.example.cinema.wallet.WalletCommand;
+import com.example.cinema.wallet.WalletCommandResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.concurrent.CompletionStage;
 
 @Component
@@ -13,8 +14,6 @@ public class WalletClient {
 
     @Autowired
     private WebClient webClient;
-
-    private Duration timeout = Duration.ofSeconds(10);
 
     public CompletionStage<WalletCommandResponse.Ack> createWallet(String walletId, int initialBalance) {
         return webClient.post().uri("/wallet/" + walletId + "/create/" + initialBalance)

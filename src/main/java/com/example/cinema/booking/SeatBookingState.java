@@ -11,7 +11,7 @@ public record SeatBookingState(String reservationId, String showId, int seatNumb
         return new SeatBookingState(reservationId, showId, seatNumber, walletId,  SeatBookingStateStatus.STARTED,Optional.empty(), Optional.empty());
     }
     public SeatBookingState asSeatBookingStateFailed(String reason) {
-        return new SeatBookingState(reservationId, showId, seatNumber, walletId, SeatBookingStateStatus.SEAT_RESERVATION_FAILED, price, Optional.ofNullable(reason));
+        return new SeatBookingState(reservationId, showId, seatNumber, walletId, status, price, Optional.ofNullable(reason));
     }
 
     public SeatBookingState asSeatReserved(BigDecimal price) {

@@ -9,4 +9,7 @@ public record SeatBookingCommandResponse(Optional<SeatBookingState> state, SeatB
     public static SeatBookingCommandResponse error (SeatBookingCommandError error){
         return new SeatBookingCommandResponse(Optional.empty(),error);
     }
+    public static SeatBookingCommandResponse error (SeatBookingState state,SeatBookingCommandError error){
+        return new SeatBookingCommandResponse(Optional.of(state),error);
+    }
 }

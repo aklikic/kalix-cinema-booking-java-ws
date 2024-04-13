@@ -27,7 +27,7 @@ class ShowEntityTest {
     //when
     testKit.call(s -> s.createShow(showId, createShow));
     testKit.call(s -> s.reserveSeat(reserveSeat));
-    EventSourcedResult<ShowCommandResponse> result = testKit.call(s -> s.confirmSeatReservationPayment(reservationId));
+    EventSourcedResult<ShowCommandResponse.Ack> result = testKit.call(s -> s.confirmSeatReservationPayment(reservationId));
 
     //then
     var confirmedSeat = testKit.getState().seats().get(seatNumberToReserve);

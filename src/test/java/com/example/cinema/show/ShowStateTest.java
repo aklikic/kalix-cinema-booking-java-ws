@@ -272,7 +272,7 @@ class ShowStateTest {
     assertEquals(maxSeats-1, updatedShow.availableSeatsCount());
     assertEquals(0, updatedShow.pendingReservations().size());
     assertEquals(1, updatedShow.payedReservations().size());
-    assertTrue(seatNumberToReserve == updatedShow.payedReservations().get(reservationId).seatNumber());
+    assertEquals(reservationId, updatedShow.seats().get(seatNumberToReserve).reservationId().orElse(null));
     assertEquals(ShowState.SeatStatus.PAID,updatedShow.seats().get(seatNumberToReserve).status());
   }
 

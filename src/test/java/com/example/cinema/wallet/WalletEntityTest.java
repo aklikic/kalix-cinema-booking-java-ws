@@ -20,7 +20,7 @@ class WalletEntityTest {
     EventSourcedTestKit<WalletState, WalletEvent, WalletEntity> testKit = EventSourcedTestKit.of(WalletEntity::new);
 
     //when
-    EventSourcedResult<WalletCommandResponse> result = testKit.call(wallet -> wallet.createWallet(walletId, initialAmount));
+    EventSourcedResult<WalletCommandResponse.Ack> result = testKit.call(wallet -> wallet.createWallet(walletId, initialAmount));
 
     //then
     assertThat(result.isReply()).isTrue();
@@ -40,7 +40,7 @@ class WalletEntityTest {
     var chargeWallet = new WalletCommand.ChargeWallet(new BigDecimal(10), expenseId);
 
     //when
-    EventSourcedResult<WalletCommandResponse> result = testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
+    EventSourcedResult<WalletCommandResponse.Ack> result = testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //then
     assertThat(result.isReply()).isTrue();
@@ -60,7 +60,7 @@ class WalletEntityTest {
     testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //when
-    EventSourcedResult<WalletCommandResponse> result = testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
+    EventSourcedResult<WalletCommandResponse.Ack> result = testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //then
     assertThat(result.isReply()).isTrue();
@@ -80,7 +80,7 @@ class WalletEntityTest {
     testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //when
-    EventSourcedResult<WalletCommandResponse> result = testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
+    EventSourcedResult<WalletCommandResponse.Ack> result = testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //then
     assertThat(result.isReply()).isTrue();

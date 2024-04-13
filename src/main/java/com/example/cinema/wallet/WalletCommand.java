@@ -2,7 +2,7 @@ package com.example.cinema.wallet;
 
 import java.math.BigDecimal;
 
-sealed interface WalletCommand {
+public sealed interface WalletCommand {
 
     sealed interface RequiresDeduplicationCommand extends WalletCommand {
         String commandId();

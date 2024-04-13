@@ -24,7 +24,7 @@ public class WalletEntity extends EventSourcedEntity<WalletState, WalletEvent> {
   }
 
   @PostMapping("/create/{initialBalance}")
-  public Effect<WalletCommandResponse> createWallet(@PathVariable String id, @PathVariable int initialBalance) {
+  public Effect<WalletCommandResponse.Ack> createWallet(@PathVariable String id, @PathVariable int initialBalance) {
     var createWallet = new WalletCommand.CreateWallet(BigDecimal.valueOf(initialBalance));
     var result = currentState().handleCommand(id, createWallet);
     return handleStateCommandProcessResult(result);
@@ -33,29 +33,29 @@ public class WalletEntity extends EventSourcedEntity<WalletState, WalletEvent> {
 
 
   @PatchMapping("/charge")
-  public Effect<WalletCommandResponse> chargeWallet(@RequestBody WalletCommand.ChargeWallet chargeWallet) {
+  public Effect<WalletCommandResponse.Ack> chargeWallet(@RequestBody WalletCommand.ChargeWallet chargeWallet) {
     if (currentState().isEmpty()) {
-      return effects().reply(WalletCommandResponse.of(currentState().id(),WalletCommandError.WALLET_NOT_FOUND));
+      return effects().reply(WalletCommandResponse.Ack.error(WalletCommandError.WALLET_NOT_FOUND));
     }
     var result = currentState().handleCommand(chargeWallet);
     return handleStateCommandProcessResult(result);
   }
 
-  @PatchMapping("/refund/{expenseId}")
-  public Effect<WalletCommandResponse> refundWalletCharge(@RequestBody WalletCommand.Refund refund) {
+  @PatchMapping("/refund")
+  public Effect<WalletCommandResponse.Ack> refundWalletCharge(@RequestBody WalletCommand.Refund refund) {
     if (currentState().isEmpty()) {
-      return effects().reply(WalletCommandResponse.of(currentState().id(),WalletCommandError.WALLET_NOT_FOUND));
+      return effects().reply(WalletCommandResponse.Ack.error(WalletCommandError.WALLET_NOT_FOUND));
     }
     var result = currentState().handleCommand(refund);
     return handleStateCommandProcessResult(result);
   }
 
   @GetMapping
-  public Effect<WalletCommandResponse> get() {
+  public Effect<WalletCommandResponse.WalletCommandSummeryResponse> get() {
     if (currentState().isEmpty()) {
-      return effects().reply(WalletCommandResponse.of(currentState().id(),WalletCommandError.WALLET_NOT_FOUND));
+      return effects().reply(WalletCommandResponse.WalletCommandSummeryResponse.error(currentState().id(),WalletCommandError.WALLET_NOT_FOUND));
     } else {
-      return effects().reply(WalletCommandResponse.of(currentState()));
+      return effects().reply(WalletCommandResponse.WalletCommandSummeryResponse.ok(currentState()));
     }
   }
 
@@ -80,19 +80,19 @@ public class WalletEntity extends EventSourcedEntity<WalletState, WalletEvent> {
     return currentState().onEvent(walletCharged);
   }
 
-  private Effect<WalletCommandResponse> handleStateCommandProcessResult(StateCommandProcessResult<WalletEvent,WalletCommandError> result){
+  private Effect<WalletCommandResponse.Ack> handleStateCommandProcessResult(StateCommandProcessResult<WalletEvent,WalletCommandError> result){
     if(!result.events().isEmpty()){
       return effects().emitEvents(result.events())
               .thenReply(updateState ->
                       result.error()
-                              .map(error -> WalletCommandResponse.of(updateState.id(), error))
-                              .orElse(WalletCommandResponse.of(updateState))
+                              .map(error -> WalletCommandResponse.Ack.error( error))
+                              .orElse(WalletCommandResponse.Ack.ok())
               );
     }else{
       return effects().reply(
               result.error()
-                      .map(error -> WalletCommandResponse.of(currentState().id(),error))
-                      .orElse(WalletCommandResponse.of(currentState()))
+                      .map(error -> WalletCommandResponse.Ack.error(error))
+                      .orElse(WalletCommandResponse.Ack.ok())
               );
     }
   }

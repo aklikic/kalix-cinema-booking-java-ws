@@ -22,24 +22,24 @@ public class ShowEntity extends EventSourcedEntity<ShowState, ShowEvent> {
   }
 
   @PostMapping
-  public Effect<ShowCommandResponse> createShow(@PathVariable String id, @RequestBody ShowCommand.CreateShow createShow) {
+  public Effect<ShowCommandResponse.Ack> createShow(@PathVariable String id, @RequestBody ShowCommand.CreateShow createShow) {
     var result = currentState().handleCommand(id, createShow);
     return handleStateCommandProcessResult(result);
   }
 
   @PatchMapping("/reserve")
-  public Effect<ShowCommandResponse> reserveSeat(@RequestBody ShowCommand.ReserveSeat reserveSeat) {
+  public Effect<ShowCommandResponse.ShowReserveCommandResponse> reserveSeat(@RequestBody ShowCommand.ReserveSeat reserveSeat) {
     if (currentState().isEmpty()) {
-      return effects().reply(ShowCommandResponse.of(currentState().id(),ShowCommandError.SHOW_NOT_FOUND));
+      return effects().reply(ShowCommandResponse.ShowReserveCommandResponse.error(ShowCommandError.SHOW_NOT_FOUND));
     }
     var result = currentState().handleCommand(reserveSeat);
-    return handleStateCommandProcessResult(result);
+    return handleStateCommandProcessResult(result, reserveSeat);
   }
 
   @PatchMapping("/cancel-reservation/{reservationId}")
-  public Effect<ShowCommandResponse> cancelSeatReservation(@PathVariable String reservationId) {
+  public Effect<ShowCommandResponse.Ack> cancelSeatReservation(@PathVariable String reservationId) {
     if (currentState().isEmpty()) {
-      return effects().reply(ShowCommandResponse.of(currentState().id(),ShowCommandError.SHOW_NOT_FOUND));
+      return effects().reply(ShowCommandResponse.Ack.error(ShowCommandError.SHOW_NOT_FOUND));
     }
     var cancelReservation = new ShowCommand.CancelSeatReservation(reservationId);
     var result = currentState().handleCommand(cancelReservation);
@@ -47,9 +47,9 @@ public class ShowEntity extends EventSourcedEntity<ShowState, ShowEvent> {
   }
 
   @PatchMapping("/confirm-payment/{reservationId}")
-  public Effect<ShowCommandResponse> confirmSeatReservationPayment(@PathVariable String reservationId) {
+  public Effect<ShowCommandResponse.Ack> confirmSeatReservationPayment(@PathVariable String reservationId) {
     if (currentState().isEmpty()) {
-      return effects().reply(ShowCommandResponse.of(currentState().id(),ShowCommandError.SHOW_NOT_FOUND));
+      return effects().reply(ShowCommandResponse.Ack.error(ShowCommandError.SHOW_NOT_FOUND));
     }
     var confirmReservationPayment = new ShowCommand.ConfirmReservationPayment(reservationId);
     var result = currentState().handleCommand(confirmReservationPayment);
@@ -57,20 +57,20 @@ public class ShowEntity extends EventSourcedEntity<ShowState, ShowEvent> {
   }
 
   @GetMapping
-  public Effect<ShowCommandResponse> get() {
+  public Effect<ShowCommandResponse.ShowSummeryResponse> get() {
     if (currentState().isEmpty()) {
-      return effects().reply(ShowCommandResponse.of(currentState().id(),ShowCommandError.SHOW_NOT_FOUND));
+      return effects().reply(ShowCommandResponse.ShowSummeryResponse.error(currentState().id(),ShowCommandError.SHOW_NOT_FOUND));
     } else {
-      return effects().reply(ShowCommandResponse.of(currentState()));
+      return effects().reply(ShowCommandResponse.ShowSummeryResponse.ok(currentState()));
     }
   }
 
   @GetMapping("/seat-status/{seatNumber}")
-  public Effect<ShowSeatStatusCommandResponse> getSeatStatus(@PathVariable int seatNumber) {
+  public Effect<ShowCommandResponse.ShowSeatStatusCommandResponse> getSeatStatus(@PathVariable int seatNumber) {
     if (currentState().isEmpty()) {
-      return effects().reply(ShowSeatStatusCommandResponse.of(currentState().id(),seatNumber,ShowCommandError.SHOW_NOT_FOUND));
+      return effects().reply(ShowCommandResponse.ShowSeatStatusCommandResponse.error(currentState().id(),seatNumber,ShowCommandError.SHOW_NOT_FOUND));
     } else {
-      return effects().reply(ShowSeatStatusCommandResponse.of(currentState(),seatNumber));
+      return effects().reply(ShowCommandResponse.ShowSeatStatusCommandResponse.ok(currentState(),seatNumber));
     }
   }
 
@@ -94,20 +94,38 @@ public class ShowEntity extends EventSourcedEntity<ShowState, ShowEvent> {
     return currentState().onEvent(event);
   }
 
-  private Effect<ShowCommandResponse> handleStateCommandProcessResult(StateCommandProcessResult<ShowEvent, ShowCommandError> result){
+  private Effect<ShowCommandResponse.Ack> handleStateCommandProcessResult(StateCommandProcessResult<ShowEvent, ShowCommandError> result){
     if(!result.events().isEmpty()){
       return effects().emitEvents(result.events())
               .thenReply(updateState ->
                       result.error()
-                              .map(error -> ShowCommandResponse.of(updateState.id(),error))
-                              .orElse(ShowCommandResponse.of(updateState))
+                              .map(error -> ShowCommandResponse.Ack.error(error))
+                              .orElse(ShowCommandResponse.Ack.ok())
               );
     }else{
       return effects().reply(
               result.error()
-                      .map(error -> ShowCommandResponse.of(currentState().id(),error))
-                      .orElse(ShowCommandResponse.of(currentState()))
+                      .map(error -> ShowCommandResponse.Ack.error(error))
+                      .orElse(ShowCommandResponse.Ack.ok())
               );
     }
   }
+
+  private Effect<ShowCommandResponse.ShowReserveCommandResponse> handleStateCommandProcessResult(StateCommandProcessResult<ShowEvent, ShowCommandError> result, ShowCommand.ReserveSeat reserveSeat){
+    if(!result.events().isEmpty()){
+      return effects().emitEvents(result.events())
+              .thenReply(updateState ->
+                      result.error()
+                              .map(error -> ShowCommandResponse.ShowReserveCommandResponse.error(error))
+                              .orElse(ShowCommandResponse.ShowReserveCommandResponse.ok(reserveSeat.seatNumber(),updateState.seatPrice()))
+              );
+    }else{
+      return effects().reply(
+              result.error()
+                      .map(error -> ShowCommandResponse.ShowReserveCommandResponse.error(error))
+                      .orElse(ShowCommandResponse.ShowReserveCommandResponse.ok(reserveSeat.seatNumber(),currentState().seatPrice()))
+      );
+    }
+  }
+
 }

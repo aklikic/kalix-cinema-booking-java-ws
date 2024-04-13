@@ -1,17 +1,19 @@
-package com.example.cinema.booking;
+package com.example.cinema.client;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.example.cinema.booking.SeatBookingCommand;
+import com.example.cinema.booking.SeatBookingCommandResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.concurrent.CompletionStage;
 
 
-@Component
 public class SeatBookingClient {
 
-  @Autowired
-  private WebClient webClient;
+  final private WebClient webClient;
+
+  public SeatBookingClient(WebClient webClient) {
+    this.webClient = webClient;
+  }
 
   public CompletionStage<SeatBookingCommandResponse> start(String reservationId, String showId, int seatNumber, String walletId) {
     return webClient.post().uri("/seat-booking/" + reservationId)

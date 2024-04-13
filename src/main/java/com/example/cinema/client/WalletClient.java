@@ -1,19 +1,19 @@
-package com.example.cinema.booking;
+package com.example.cinema.client;
 
 import com.example.cinema.wallet.WalletCommand;
 import com.example.cinema.wallet.WalletCommandResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CompletionStage;
 
-@Component
 public class WalletClient {
 
-    @Autowired
-    private WebClient webClient;
+    final private WebClient webClient;
+
+    public WalletClient(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public CompletionStage<WalletCommandResponse.Ack> createWallet(String walletId, int initialBalance) {
         return webClient.post().uri("/wallet/" + walletId + "/create/" + initialBalance)

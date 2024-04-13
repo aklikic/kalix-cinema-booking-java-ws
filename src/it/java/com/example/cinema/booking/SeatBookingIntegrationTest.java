@@ -1,6 +1,9 @@
 package com.example.cinema.booking;
 
 import com.example.cinema.Main;
+import com.example.cinema.client.SeatBookingClient;
+import com.example.cinema.client.ShowClient;
+import com.example.cinema.client.WalletClient;
 import com.example.cinema.show.ShowCommandError;
 import com.example.cinema.show.ShowState;
 import com.example.cinema.wallet.WalletCommandError;
@@ -8,7 +11,7 @@ import kalix.spring.testkit.KalixIntegrationTestKitSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -24,14 +27,19 @@ import java.util.concurrent.TimeUnit;
 @SpringBootTest(classes = Main.class)
 public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
 
-  @Autowired
-  private ShowClient showClient;
+  private final ShowClient showClient;
+  private final WalletClient walletClient;
+  private final SeatBookingClient seatBookingClient;
 
   @Autowired
-  private WalletClient walletClient;
+  public SeatBookingIntegrationTest(WebClient webClient) {
+      this.showClient = new ShowClient(webClient);
+      this.walletClient = new WalletClient(webClient);
+      this.seatBookingClient = new SeatBookingClient(webClient);
+  }
 
-  @Autowired
-  private SeatBookingClient seatBookingClient;
+
+
 
 
   private static final long timeoutSec = 10;

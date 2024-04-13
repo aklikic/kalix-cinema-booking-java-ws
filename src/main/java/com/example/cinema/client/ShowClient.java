@@ -1,4 +1,4 @@
-package com.example.cinema.booking;
+package com.example.cinema.client;
 
 import com.example.cinema.show.ShowCommand;
 import com.example.cinema.show.ShowCommandResponse;
@@ -10,11 +10,13 @@ import java.math.BigDecimal;
 import java.util.concurrent.CompletionStage;
 
 
-@Component
 public class ShowClient {
 
-  @Autowired
-  private WebClient webClient;
+  final private WebClient webClient;
+
+  public ShowClient(WebClient webClient) {
+    this.webClient = webClient;
+  }
 
   public CompletionStage<ShowCommandResponse.Ack> createShow(String showId, String title, BigDecimal seatPrice, int maxSeats) {
 

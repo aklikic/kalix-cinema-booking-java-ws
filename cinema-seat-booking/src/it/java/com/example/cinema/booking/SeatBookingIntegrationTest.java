@@ -6,12 +6,10 @@ import com.example.cinema.show.ShowClient;
 import com.example.cinema.show.ShowCommandError;
 import com.example.cinema.wallet.WalletClient;
 import com.example.cinema.wallet.WalletCommandError;
-import kalix.spring.WebClientProvider;
 import kalix.spring.testkit.KalixIntegrationTestKitSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
@@ -25,7 +23,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 
 
-//@SpringBootTest(classes = Main.class)
+@SpringBootTest(classes = Main.class)
 public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
 
   @Autowired
@@ -34,12 +32,12 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
   private final WalletClient walletClient;
   private final ShowClient showClient;
 
-    public SeatBookingIntegrationTest(WebClient webClientProvider) {
-        this.walletClient = new WalletClient(webClientProvider);
-        this.showClient = new ShowClient(webClientProvider);
-    }
+  public SeatBookingIntegrationTest() {
+    this.walletClient = new WalletClient(WebClient.create("http://localhost:9001"));
+    this.showClient = new ShowClient(WebClient.create("http://localhost:9000"));
+  }
 
-    private static final long timeoutSec = 10;
+  private static final long timeoutSec = 10;
 
     @Test
   public void shouldCompleteSeatReservation() throws Exception{

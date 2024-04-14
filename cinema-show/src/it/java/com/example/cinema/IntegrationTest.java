@@ -1,11 +1,19 @@
 package com.example.cinema;
 
 import com.example.cinema.show.Main;
+import com.example.cinema.show.ShowClient;
+import com.example.cinema.show.ShowCommandError;
 import kalix.spring.testkit.KalixIntegrationTestKitSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -20,12 +28,32 @@ import org.springframework.web.reactive.function.client.WebClient;
 @SpringBootTest(classes = Main.class)
 public class IntegrationTest extends KalixIntegrationTestKitSupport {
 
-  @Autowired
-  private WebClient webClient;
+  private static final long timeoutSec = 10;
+  private final ShowClient showClient;
+
+  public IntegrationTest(@Autowired WebClient webClient) {
+    this.showClient = new ShowClient(webClient);
+  }
 
   @Test
   public void test() throws Exception {
-    // implement your integration tests here by calling your
-    // REST endpoints using the provided WebClient
+    //given
+    var walletId = UUID.randomUUID().toString();
+    var showId = UUID.randomUUID().toString();
+    var title = "title";
+    var maxSeats = 10 ;
+    var seatPrice = new BigDecimal(100);
+    var reservationId = UUID.randomUUID().toString();
+    var seatNumber = 3;
+
+    var showAck = showClient.createShow(showId,title,seatPrice,maxSeats).toCompletableFuture().get(timeoutSec, TimeUnit.SECONDS);
+    assertEquals(ShowCommandError.NO_ERROR,showAck.error());
+
+    var reserveAck = showClient.reserveSeat(showId,walletId,reservationId,seatNumber).toCompletableFuture().get(timeoutSec, TimeUnit.SECONDS);
+    assertEquals(ShowCommandError.NO_ERROR,reserveAck.error());
+    assertEquals(seatPrice,reserveAck.price());
+
+    var cancelAck = showClient.cancelSeatReservation(showId,reservationId).toCompletableFuture().get(timeoutSec, TimeUnit.SECONDS);
+    assertEquals(ShowCommandError.NO_ERROR,cancelAck.error());
   }
 }

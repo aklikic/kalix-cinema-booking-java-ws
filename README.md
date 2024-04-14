@@ -18,12 +18,12 @@ curl -XGET http://localhost:9000/cinema-show/1/seat-status/1 -H "Content-Type: a
 
 Create wallet with initial balance:
 ```shell
-curl -XPOST http://localhost:9000/wallet/1/create/100 -H "Content-Type: application/json"
+curl -XPOST http://localhost:9001/wallet/1/create/100 -H "Content-Type: application/json"
 ```
 
 Get wallet:
 ```shell
-curl -XGET http://localhost:9000/wallet/1 -H "Content-Type: application/json"
+curl -XGET http://localhost:9001/wallet/1 -H "Content-Type: application/json"
 ```
 
 Start seat booking:
@@ -32,9 +32,20 @@ curl -XPOST -d '{
   "showId": "1",
   "seatNumber": 1,
   "walletId": "1"
-}' http://localhost:9000/seat-booking/res1 -H "Content-Type: application/json"
+}' http://localhost:9002/seat-booking/res1 -H "Content-Type: application/json"
 ```
 Get seat reservation state:
 ```shell
-curl -XGET http://localhost:9000/seat-booking/res1 -H "Content-Type: application/json"
+curl -XGET http://localhost:9002/seat-booking/res1 -H "Content-Type: application/json"
+```
+
+
+# Help
+Reserve a seat:
+```shell
+curl -XPATCH -v -d '{
+  "walletId": "1",
+  "reservationId": "res456789",
+  "seatNumber": "2"
+}' http://localhost:9000/cinema-show/1/reserve -H "Content-Type: application/json"
 ```

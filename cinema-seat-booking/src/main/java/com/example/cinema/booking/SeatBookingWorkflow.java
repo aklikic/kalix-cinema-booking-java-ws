@@ -10,6 +10,7 @@ import com.example.cinema.wallet.WalletCommandResponse;
 import kalix.javasdk.annotations.Id;
 import kalix.javasdk.annotations.TypeId;
 import kalix.javasdk.workflow.Workflow;
+import kalix.spring.WebClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -32,10 +34,19 @@ public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
   public static final String CONFIRM_RESERVATION_STEP = "confirm-reservation";
   public static final String REFUND_STEP = "refund";
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
-  @Autowired
-  private ShowClient showClient;
-  @Autowired
-  private WalletClient walletClient;
+
+  private final ShowClient showClient;
+  private final WalletClient walletClient;
+
+//  public SeatBookingWorkflow() {
+//    this.walletClient = new WalletClient(WebClient.create("http://localhost:9001"));
+//    this.showClient = new ShowClient(WebClient.create("http://localhost:9000"));
+//  }
+
+  public SeatBookingWorkflow(WebClientProvider webClientProvider) {
+    this.showClient = new ShowClient(webClientProvider.webClientFor("cinema-show"));
+    this.walletClient = new WalletClient(webClientProvider.webClientFor("cinema-wallet"));
+  }
 
   private String reservationId() {
     return commandContext().workflowId();

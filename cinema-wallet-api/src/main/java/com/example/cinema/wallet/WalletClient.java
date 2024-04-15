@@ -10,10 +10,6 @@ public class WalletClient {
 
     final private WebClient webClient;
 
-    public WalletClient(WebClientProvider webClientProvider) {
-        this.webClient = webClientProvider.webClientFor("cinema-show");
-    }
-
     public WalletClient(WebClient webClient) {
         this.webClient = webClient;
     }

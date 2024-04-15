@@ -13,10 +13,6 @@ public class ShowClient {
     private static final Logger logger = LoggerFactory.getLogger(ShowClient.class);
     final private WebClient webClient;
 
-    public ShowClient(WebClientProvider webClientProvider) {
-        this.webClient = webClientProvider.webClientFor("cinema-show");
-    }
-
     public ShowClient(WebClient webClient) {
         this.webClient = webClient;
     }

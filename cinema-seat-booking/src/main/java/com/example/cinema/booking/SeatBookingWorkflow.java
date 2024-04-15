@@ -35,20 +35,18 @@ public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
   public static final String REFUND_STEP = "refund";
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Autowired
-  private ShowClient showClient;
-  @Autowired
-  private  WalletClient walletClient;
+  private final ShowClient showClient;
+  private final WalletClient walletClient;
 
 //  public SeatBookingWorkflow() {
 //    this.walletClient = new WalletClient(WebClient.create("http://localhost:9001"));
 //    this.showClient = new ShowClient(WebClient.create("http://localhost:9000"));
 //  }
 
-//  public SeatBookingWorkflow(WebClientProvider webClientProvider) {
-//    this.showClient = new ShowClient(webClientProvider.webClientFor("cinema-show"));
-//    this.walletClient = new WalletClient(webClientProvider.webClientFor("cinema-wallet"));
-//  }
+  public SeatBookingWorkflow(WebClientProvider webClientProvider) {
+    this.showClient = new ShowClient(webClientProvider.webClientFor("cinema-show"));
+    this.walletClient = new WalletClient(webClientProvider.webClientFor("cinema-wallet"));
+  }
 
   private String reservationId() {
     return commandContext().workflowId();

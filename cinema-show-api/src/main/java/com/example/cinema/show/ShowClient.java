@@ -3,26 +3,23 @@ package com.example.cinema.show;
 import kalix.spring.WebClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CompletionStage;
 
-@Component
 public class ShowClient {
 
     private static final Logger logger = LoggerFactory.getLogger(ShowClient.class);
     final private WebClient webClient;
 
-    public ShowClient(@Autowired WebClientProvider webClientProvider) {
+    public ShowClient(WebClientProvider webClientProvider) {
         this.webClient = webClientProvider.webClientFor("cinema-show");
     }
 
-//    public ShowClient(WebClient webClient) {
-//        this.webClient = webClient;
-//    }
+    public ShowClient(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public CompletionStage<ShowCommandResponse.Ack> createShow(String showId, String title, BigDecimal seatPrice, int maxSeats) {
         logger.info("createShow: {}",showId);

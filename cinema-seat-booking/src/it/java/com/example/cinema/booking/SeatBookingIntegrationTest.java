@@ -6,6 +6,8 @@ import com.example.cinema.show.ShowClient;
 import com.example.cinema.show.ShowCommandError;
 import com.example.cinema.wallet.WalletClient;
 import com.example.cinema.wallet.WalletCommandError;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import kalix.spring.WebClientProvider;
 import kalix.spring.testkit.KalixIntegrationTestKitSupport;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -30,13 +34,15 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
   @Autowired
   private SeatBookingClient seatBookingClient;
 
-  @Autowired
   private  WalletClient walletClient;
-  @Autowired
   private  ShowClient showClient;
 
-
-  private static final long timeoutSec = 10;
+    public SeatBookingIntegrationTest() throws Exception{
+        var config = ConfigFactory.load();
+        this.walletClient = new WalletClient(getWebClient(config,"cinema-wallet"));
+        this.showClient = new ShowClient(getWebClient(config,"cinema-show"));
+    }
+    private static final long timeoutSec = 10;
 
     @Test
   public void shouldCompleteSeatReservation() throws Exception{
@@ -113,4 +119,10 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
                     assertEquals(SeatStatus.AVAILABLE,showSeatStatusGet.seatStatus());
                 });
     }
+
+    private WebClient getWebClient(Config config, String serviceName){
+        var mapping = config.getString("kalix.dev-mode.service-port-mappings."+serviceName);
+        return WebClient.create("http://" + mapping);
+    }
+
 }

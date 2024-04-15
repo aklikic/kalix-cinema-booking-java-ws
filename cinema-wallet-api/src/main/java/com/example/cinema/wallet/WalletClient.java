@@ -1,26 +1,22 @@
 package com.example.cinema.wallet;
 
 import kalix.spring.WebClientProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CompletionStage;
 
-@Component
 public class WalletClient {
 
     final private WebClient webClient;
 
-    public WalletClient(@Autowired WebClientProvider webClientProvider) {
+    public WalletClient(WebClientProvider webClientProvider) {
         this.webClient = webClientProvider.webClientFor("cinema-show");
     }
 
-//    public WalletClient(WebClient webClient) {
-//        this.webClient = webClient;
-//    }
+    public WalletClient(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public CompletionStage<WalletCommandResponse.Ack> createWallet(String walletId, int initialBalance) {
         return webClient.post().uri("/wallet/" + walletId + "/create/" + initialBalance)

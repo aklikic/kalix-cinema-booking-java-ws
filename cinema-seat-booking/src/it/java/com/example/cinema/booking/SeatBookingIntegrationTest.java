@@ -30,13 +30,11 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
   @Autowired
   private SeatBookingClient seatBookingClient;
 
-  private final WalletClient walletClient;
-  private final ShowClient showClient;
+  @Autowired
+  private  WalletClient walletClient;
+  @Autowired
+  private  ShowClient showClient;
 
-  public SeatBookingIntegrationTest(WebClientProvider webClientProvider) {
-    this.walletClient = new WalletClient(webClientProvider);
-    this.showClient = new ShowClient(webClientProvider);
-  }
 
   private static final long timeoutSec = 10;
 

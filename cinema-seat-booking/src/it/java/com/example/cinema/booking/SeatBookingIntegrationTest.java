@@ -6,6 +6,7 @@ import com.example.cinema.show.ShowClient;
 import com.example.cinema.show.ShowCommandError;
 import com.example.cinema.wallet.WalletClient;
 import com.example.cinema.wallet.WalletCommandError;
+import kalix.spring.WebClientProvider;
 import kalix.spring.testkit.KalixIntegrationTestKitSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,9 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
   private final WalletClient walletClient;
   private final ShowClient showClient;
 
-  public SeatBookingIntegrationTest() {
-    this.walletClient = new WalletClient(WebClient.create("http://localhost:9001"));
-    this.showClient = new ShowClient(WebClient.create("http://localhost:9000"));
+  public SeatBookingIntegrationTest(WebClientProvider webClientProvider) {
+    this.walletClient = new WalletClient(webClientProvider);
+    this.showClient = new ShowClient(webClientProvider);
   }
 
   private static final long timeoutSec = 10;

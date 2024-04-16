@@ -3,11 +3,9 @@ package com.example.cinema.show;
 import com.example.cinema.util.StateCommandProcessResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -25,19 +23,22 @@ public record ShowState(String id, String title, BigDecimal seatPrice, Map<Integ
         this(id ,title, seatPrice, new HashMap<>(), new HashMap<>(), new HashMap<>(), 0);
     }
 
-    public record Seat(int number, SeatStatus status, Optional<String> reservationId) {
+    public record Seat(int number, SeatStatus status, Optional<String> walletId, Optional<String> reservationId, Optional<String> reservationCancellationId) {
         @JsonIgnore
         public boolean isAvailable() {
             return status == SeatStatus.AVAILABLE;
         }
-        public Seat reserved(String reservationId) {
-            return new Seat(number, SeatStatus.RESERVED, Optional.of(reservationId));
+        public Seat reserved(String walletId, String reservationId) {
+            return new Seat(number, SeatStatus.RESERVED, Optional.of(walletId), Optional.of(reservationId), reservationCancellationId);
         }
         public Seat paid() {
-            return new Seat(number, SeatStatus.PAID, reservationId);
+            return new Seat(number, SeatStatus.PAID, walletId, reservationId,reservationCancellationId);
+        }
+        public Seat cancel(String reservationCancellationId){
+            return new Seat(number, SeatStatus.CANCELING, walletId, reservationId,Optional.of(reservationCancellationId));
         }
         public Seat available() {
-            return new Seat(number, SeatStatus.AVAILABLE, Optional.empty());
+            return new Seat(number, SeatStatus.AVAILABLE, Optional.empty(),Optional.empty(),Optional.empty());
         }
     }
 
@@ -67,7 +68,7 @@ public record ShowState(String id, String title, BigDecimal seatPrice, Map<Integ
             if(seats.containsKey(seatNumber)){
                 var seat = seats.get(seatNumber);
                 if (seat.isAvailable()) {
-                    return result(new ShowEvent.SeatReserved(id, reserveSeat.walletId(), reserveSeat.reservationId(), seatNumber,  availableSeatsCount()-1));
+                    return result(new ShowEvent.SeatReserved(id, reserveSeat.walletId(), reserveSeat.reservationId(), seatNumber,  seatPrice,availableSeatsCount()-1));
                 } else {
                     return error(SEAT_NOT_AVAILABLE);
                 }
@@ -83,7 +84,8 @@ public record ShowState(String id, String title, BigDecimal seatPrice, Map<Integ
             var seatNumber = pendingReservations.get(reservationId);
             if(seats.containsKey(seatNumber)){
                 var seat = seats.get(seatNumber);
-                return result(new ShowEvent.SeatReservationCancelled(id, reservationId, seatNumber, availableSeatsCount()+1));
+                var cancellationReservationId = UUID.randomUUID().toString();
+                return result(new ShowEvent.SeatReservationCancelled(id, seat.walletId().get(), reservationId,  cancellationReservationId, seatNumber, availableSeatsCount()+1));
             }else{
                 return error(SEAT_NOT_FOUND);
             }
@@ -122,7 +124,7 @@ public record ShowState(String id, String title, BigDecimal seatPrice, Map<Integ
 
     public ShowState onEvent(ShowEvent.SeatReserved event) {
         Seat seat = seats.get(event.seatNumber());
-        seats.put(seat.number(), seat.reserved(event.reservationId()));
+        seats.put(seat.number(), seat.reserved(event.walletId(), event.reservationId()));
         pendingReservations.put(event.reservationId(), event.seatNumber());
         return new ShowState(id, title, seatPrice, seats,pendingReservations,payedReservations,event.availableSeatsCount());
     }
@@ -150,6 +152,6 @@ public record ShowState(String id, String title, BigDecimal seatPrice, Map<Integ
         return id.equals(EMPTY_SHOW_ID);
     }
     private static List<Seat> createSeats(int maxSeats) {
-        return IntStream.range(0, maxSeats).mapToObj(seatNum -> new Seat(seatNum, SeatStatus.AVAILABLE,Optional.empty())).toList();
+        return IntStream.range(0, maxSeats).mapToObj(seatNum -> new Seat(seatNum, SeatStatus.AVAILABLE,Optional.empty(), Optional.empty(),Optional.empty())).toList();
     }
 }

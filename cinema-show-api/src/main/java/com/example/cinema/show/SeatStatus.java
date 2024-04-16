@@ -1,5 +1,5 @@
 package com.example.cinema.show;
 
 public enum SeatStatus {
-    AVAILABLE, RESERVED, PAID
+    AVAILABLE, RESERVED, PAID, CANCELING
 }

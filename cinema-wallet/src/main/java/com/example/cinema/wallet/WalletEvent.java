@@ -10,11 +10,11 @@ sealed public interface WalletEvent {
     record WalletCreated(String walletId, BigDecimal initialAmount) implements WalletEvent {}
 
     @TypeName("wallet-charged")
-    record WalletCharged(String walletId, BigDecimal amount, String expenseId) implements WalletEvent {}
+    record WalletCharged(String walletId, String showId, BigDecimal amount, String expenseId) implements WalletEvent {}
 
     @TypeName("wallet-refunded")
-    record WalletRefunded(String walletId, BigDecimal amount, String chargeExpenseId, String refundExpenseId) implements WalletEvent {}
+    record WalletRefunded(String walletId, String showId, BigDecimal amount, String chargeExpenseId, String refundExpenseId) implements WalletEvent {}
 
     @TypeName("wallet-charge-rejected")
-    record WalletChargeRejected(String walletId, String expenseId, String reason) implements WalletEvent {}
+    record WalletChargeRejected(String walletId, String showId, String expenseId, String reason) implements WalletEvent {}
 }

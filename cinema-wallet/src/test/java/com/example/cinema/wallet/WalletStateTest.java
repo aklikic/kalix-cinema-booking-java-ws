@@ -47,7 +47,7 @@ class WalletStateTest {
   public void shouldChargeWallet() {
     //given
     var wallet = new WalletState("1", BigDecimal.TEN);
-    var chargeWallet = new WalletCommand.ChargeWallet(BigDecimal.valueOf(3), UUID.randomUUID().toString());
+    var chargeWallet = new WalletCommand.ChargeWallet(BigDecimal.valueOf(3), UUID.randomUUID().toString(), UUID.randomUUID().toString());
 
     //when
     var result = wallet.handleCommand(chargeWallet);
@@ -64,7 +64,7 @@ class WalletStateTest {
   public void shouldRejectDuplicatedCharge() {
     //given
     var wallet = new WalletState("1", BigDecimal.TEN);
-    var chargeWallet = new WalletCommand.ChargeWallet(BigDecimal.valueOf(3), UUID.randomUUID().toString());
+    var chargeWallet = new WalletCommand.ChargeWallet(BigDecimal.valueOf(3), UUID.randomUUID().toString(), UUID.randomUUID().toString());
 
     var result = wallet.handleCommand(chargeWallet);
     assertTrue(result.error().isEmpty());

@@ -11,7 +11,7 @@ public sealed interface WalletCommand {
     record CreateWallet(BigDecimal initialAmount) implements WalletCommand {
     }
 
-    record ChargeWallet(BigDecimal amount, String expenseId) implements RequiresDeduplicationCommand {
+    record ChargeWallet(BigDecimal amount, String expenseId, String showId) implements RequiresDeduplicationCommand {
         @Override
         public String commandId() {
             return expenseId;

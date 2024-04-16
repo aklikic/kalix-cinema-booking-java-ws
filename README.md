@@ -10,6 +10,18 @@ Define value for property 'artifactId': `cinema-seat-booking`<br>
 Define value for property 'version' 1.0-SNAPSHOT: :<br>
 Define value for property 'package' com.example: : `com.example.cinema.booking`<br>
 
+# Run
+Orchestration:
+Run:
+```shell
+mvn kalix:runAll
+```
+
+Choreography:
+Run:
+```shell
+mvn -Dspring.profiles.active=choreography kalix:runAll
+```
 
 # Local test
 Create show:
@@ -39,6 +51,8 @@ Get wallet:
 curl -XGET http://localhost:9001/wallet/1 -H "Content-Type: application/json"
 ```
 
+## Orchestration
+
 Start seat booking:
 ```shell
 curl -XPOST -d '{
@@ -53,13 +67,13 @@ curl -XGET http://localhost:9002/seat-booking/res1 -H "Content-Type: application
 ```
 
 
-## Help
+## Choreography
 Reserve a seat:
 ```shell
 curl -XPATCH -v -d '{
   "walletId": "1",
   "reservationId": "res456789",
-  "seatNumber": "2"
+  "seatNumber": "1"
 }' http://localhost:9000/cinema-show/1/reserve -H "Content-Type: application/json"
 ```
 

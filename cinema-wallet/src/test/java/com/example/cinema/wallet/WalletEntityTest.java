@@ -32,31 +32,33 @@ class WalletEntityTest {
   @Test
   public void shouldChargeWallet() {
     //given
+    var showId = UUID.randomUUID().toString();
     var walletId = UUID.randomUUID().toString();
     var expenseId = "r1";
     var initialAmount = 100;
     EventSourcedTestKit<WalletState, WalletEvent, WalletEntity> testKit = EventSourcedTestKit.of(WalletEntity::new);
     testKit.call(wallet -> wallet.createWallet(walletId, initialAmount));
-    var chargeWallet = new WalletCommand.ChargeWallet(new BigDecimal(10), expenseId);
+    var chargeWallet = new WalletCommand.ChargeWallet(new BigDecimal(10), expenseId, showId);
 
     //when
     EventSourcedResult<WalletCommandResponse.Ack> result = testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //then
     assertThat(result.isReply()).isTrue();
-    assertThat(result.getNextEventOfType(WalletEvent.WalletCharged.class)).isEqualTo(new WalletEvent.WalletCharged(walletId, chargeWallet.amount(), expenseId));
+    assertThat(result.getNextEventOfType(WalletEvent.WalletCharged.class)).isEqualTo(new WalletEvent.WalletCharged(walletId, showId, chargeWallet.amount(), expenseId));
     assertThat(testKit.getState().balance()).isEqualTo(new BigDecimal(90));
   }
 
   @Test
   public void shouldIgnoreChargeDuplicate() {
     //given
+    var showId = UUID.randomUUID().toString();
     var walletId = UUID.randomUUID().toString();
     var expenseId = "r1";
     var initialAmount = 100;
     EventSourcedTestKit<WalletState, WalletEvent, WalletEntity> testKit = EventSourcedTestKit.of(WalletEntity::new);
     testKit.call(wallet -> wallet.createWallet(walletId, initialAmount));
-    var chargeWallet = new WalletCommand.ChargeWallet(new BigDecimal(10), expenseId);
+    var chargeWallet = new WalletCommand.ChargeWallet(new BigDecimal(10), expenseId, showId);
     testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //when
@@ -71,12 +73,13 @@ class WalletEntityTest {
   @Test
   public void shouldRefundWallet() {
     //given
+    var showId = UUID.randomUUID().toString();
     var walletId = UUID.randomUUID().toString();
     var expenseId = "r1";
     var initialAmount = 100;
     EventSourcedTestKit<WalletState, WalletEvent, WalletEntity> testKit = EventSourcedTestKit.of(WalletEntity::new);
     testKit.call(wallet -> wallet.createWallet(walletId, initialAmount));
-    var chargeWallet = new WalletCommand.ChargeWallet(new BigDecimal(10), expenseId);
+    var chargeWallet = new WalletCommand.ChargeWallet(new BigDecimal(10), expenseId, showId);
     testKit.call(wallet -> wallet.chargeWallet(chargeWallet));
 
     //when

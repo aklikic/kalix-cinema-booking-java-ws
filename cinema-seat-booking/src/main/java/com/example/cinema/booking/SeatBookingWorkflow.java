@@ -13,12 +13,10 @@ import kalix.javasdk.workflow.Workflow;
 import kalix.spring.WebClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -49,7 +47,7 @@ public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
 
   @PostMapping
   public Effect<SeatBookingCommandResponse> start(@RequestBody SeatBookingCommand bookSeat) {
-    logger.info("Start seat booking workflow");
+    logger.info("start: reservationId=[{}], bookSeat=[{}]",bookSeat);
     if (currentState() != null) {
       return effects().reply(SeatBookingCommandResponse.error(currentState(), SeatBookingCommandError.BOOKING_ALREADY_EXISTS));
     } else {
@@ -63,6 +61,7 @@ public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
 
   @GetMapping()
   public Effect<SeatBookingCommandResponse> getState() {
+    logger.info("getState: reservationId[{}]",reservationId());
     if (currentState() == null) {
       return effects().reply(SeatBookingCommandResponse.error(SeatBookingCommandError.BOOKING_NOT_FOUND));
     } else {
@@ -77,7 +76,7 @@ public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
       .andThen(ShowCommandResponse.ShowReserveCommandResponse.class, this::chargeWalletOrStop);
 
     var chargeWallet = step(CHARGE_WALLET_STEP)
-      .asyncCall(()->walletClient.chargeWallet(currentState().walletId(),currentState().price().get(), currentState().reservationId()))
+      .asyncCall(()->walletClient.chargeWallet(currentState().walletId(),currentState().price().get(), currentState().reservationId(), currentState().showId()))
       .andThen(WalletCommandResponse.Ack.class, this::confirmOrCancelReservation);
 
     var confirmReservation = step(CONFIRM_RESERVATION_STEP)
@@ -150,7 +149,8 @@ public class SeatBookingWorkflow extends Workflow<SeatBookingState> {
               .updateState(currentState().asWalletRefunded())
               .transitionTo(CANCEL_RESERVATION_STEP);
     }else{
-      throw new IllegalStateException("Expecting successful response, but got: " + response.error());
+      return effects()
+              .transitionTo(CANCEL_RESERVATION_STEP);
     }
   }
 }

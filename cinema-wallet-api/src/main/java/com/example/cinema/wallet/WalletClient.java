@@ -22,9 +22,9 @@ public class WalletClient {
     }
 
 
-    public CompletionStage<WalletCommandResponse.Ack> chargeWallet(String walletId, BigDecimal amount, String expenseId) {
+    public CompletionStage<WalletCommandResponse.Ack> chargeWallet(String walletId, BigDecimal amount, String expenseId, String showId) {
         return webClient.patch().uri("/wallet/" + walletId + "/charge")
-                .bodyValue(new WalletCommand.ChargeWallet(amount,expenseId))
+                .bodyValue(new WalletCommand.ChargeWallet(amount,expenseId,showId))
                 .retrieve()
                 .bodyToMono(WalletCommandResponse.Ack.class)
                 .toFuture();

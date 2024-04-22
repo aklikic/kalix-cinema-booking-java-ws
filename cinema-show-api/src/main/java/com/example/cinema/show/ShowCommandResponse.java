@@ -36,7 +36,7 @@ public interface ShowCommandResponse{
         }
     }
 
-    record ShowSeatStatusCommandResponse(String showId, int seatNumber, SeatStatus seatStatus, ShowCommandError error) implements ShowCommandResponse{
+    record ShowSeatStatusCommandResponse(String showId, int seatNumber, BigDecimal seatPrice, String walletId, SeatStatus seatStatus, ShowCommandError error) implements ShowCommandResponse{
 
 //        public static ShowSeatStatusCommandResponse ok(ShowState show, int seatNumber) {
 //            return  Optional.ofNullable(show.seats().get(seatNumber))
@@ -44,7 +44,7 @@ public interface ShowCommandResponse{
 //                            .orElse(error(show.id(),seatNumber, ShowCommandError.SEAT_NOT_FOUND));
 //        }
         public static ShowSeatStatusCommandResponse error(String id, int seatNumber, ShowCommandError error) {
-            return new ShowSeatStatusCommandResponse(id, seatNumber, null, error);
+            return new ShowSeatStatusCommandResponse(id, seatNumber, BigDecimal.ZERO,null,null, error);
         }
     }
 

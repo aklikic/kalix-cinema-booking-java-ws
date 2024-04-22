@@ -15,4 +15,5 @@ sealed public interface ShowCommand {
 
     record CancelSeatReservation(String reservationId) implements ShowCommand {
     }
+
 }

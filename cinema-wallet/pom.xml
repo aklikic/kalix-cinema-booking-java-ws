@@ -107,6 +107,7 @@
                                 </assembly>
                                 <entryPoint>
                                     <arg>java</arg>
+<!--                                    <arg>-Dspring.profiles.active=choreography</arg>-->
                                     <arg>-jar</arg>
                                     <arg>/maven/${project.build.finalName}.jar</arg>
                                 </entryPoint>
@@ -244,6 +245,12 @@
         <dependency>
             <groupId>com.example.cinema</groupId>
             <artifactId>cinema-util</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.example.cinema</groupId>
+            <artifactId>cinema-show-api</artifactId>
+            <version>${cinema-show-api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.example.cinema</groupId>

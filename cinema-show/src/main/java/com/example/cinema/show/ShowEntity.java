@@ -86,7 +86,7 @@ public class ShowEntity extends EventSourcedEntity<ShowState, ShowEvent> {
       return effects().reply(ShowCommandResponse.ShowSeatStatusCommandResponse.error(currentState().id(),seatNumber,ShowCommandError.SHOW_NOT_FOUND));
     } else {
       return effects().reply(Optional.ofNullable(currentState().seats().get(seatNumber))
-                            .map(seat -> new ShowCommandResponse.ShowSeatStatusCommandResponse(currentState().id(), seatNumber,seat.status(),ShowCommandError.NO_ERROR))
+                            .map(seat -> new ShowCommandResponse.ShowSeatStatusCommandResponse(currentState().id(), seatNumber,currentState().seatPrice(), seat.walletId().orElse(null),seat.status(),ShowCommandError.NO_ERROR))
                             .orElse(ShowCommandResponse.ShowSeatStatusCommandResponse.error(currentState().id(),seatNumber, ShowCommandError.SEAT_NOT_FOUND)));
     }
   }

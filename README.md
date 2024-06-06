@@ -1,3 +1,17 @@
+# Prerequisites 
+- Java 17 or higher
+- Apache Maven
+- Docker 20.10.14 or higher (build images, docker-compose)
+- [Kalix CLI](https://docs.kalix.io/kalix/install-kalix.html) (required only for a local console run and managing service on Kalix Cloud runtime)
+
+# How to use this repo
+
+## Run and play with the code
+Skip to [Local test](#local-test)<br>
+
+## Developer Experience 
+Use this repo as a reference implementation and use [Create kickstart maven project](#create-kickstart-maven-project) for kickstarting your own project.
+
 # Create kickstart maven project
 ```
 mvn archetype:generate \

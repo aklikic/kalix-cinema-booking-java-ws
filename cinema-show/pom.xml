@@ -38,7 +38,6 @@
             <version>${cinema-wallet-api.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>

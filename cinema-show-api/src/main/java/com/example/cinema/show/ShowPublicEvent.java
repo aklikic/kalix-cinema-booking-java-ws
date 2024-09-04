@@ -1,6 +1,8 @@
 package com.example.cinema.show;
 
-import kalix.javasdk.annotations.TypeName;
+
+
+import akka.javasdk.annotations.TypeName;
 
 import java.math.BigDecimal;
 

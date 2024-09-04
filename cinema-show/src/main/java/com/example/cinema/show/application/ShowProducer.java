@@ -14,12 +14,12 @@ import org.slf4j.LoggerFactory;
 @Consume.FromEventSourcedEntity(value = ShowEntity.class, ignoreUnknown = true)
 @Produce.ServiceStream(id = "show_events")
 @Acl(allow = @Acl.Matcher(service = "*"))
-public class ShowProducerAction extends Consumer {
+public class ShowProducer extends Consumer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ComponentClient componentClient;
 
-    public ShowProducerAction(ComponentClient componentClient) {
+    public ShowProducer(ComponentClient componentClient) {
         this.componentClient = componentClient;
     }
 

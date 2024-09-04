@@ -1,7 +1,6 @@
 package com.example.cinema.show.application;
 
 import akka.Done;
-import akka.javasdk.annotations.Consume;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.consumer.Consumer;
 import com.example.cinema.wallet.WalletPublicEvent;
@@ -9,18 +8,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //TODO @Profile("choreography")
-@Consume.FromServiceStream(
-        service = "cinema-wallet",
-        id = "wallet_events",
-        consumerGroup = "show-wallet-consumer",
-        ignoreUnknown = true
-)
-public class WalletConsumerAction extends Consumer {
+//@Consume.FromServiceStream(
+//        service = "cinema-wallet",
+//        id = "wallet_events",
+//        consumerGroup = "show-wallet-consumer",
+//        ignoreUnknown = true
+//)
+public class WalletConsumer extends Consumer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ComponentClient componentClient;
 
-    public WalletConsumerAction(ComponentClient componentClient) {
+    public WalletConsumer(ComponentClient componentClient) {
         this.componentClient = componentClient;
     }
 

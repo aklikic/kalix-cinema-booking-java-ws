@@ -34,6 +34,7 @@ public class SeatBookingIntegrationTest extends AkkaSdkTestKitSupport {
 
     public SeatBookingIntegrationTest(HttpClientProvider httpClientProvider) throws Exception{
         seatBookingClient = new SeatBookingClient(componentClient);
+        logger.info("httpClient show: {}",httpClientProvider.httpClientFor("cinema-show"));
         logger.info("httpClient wallet: {}",httpClientProvider.httpClientFor("cinema-wallet"));
         this.walletClient = new WalletClient(httpClientProvider.httpClientFor("cinema-wallet"));
         this.showClient = new ShowClient(httpClientProvider.httpClientFor("cinema-show"));

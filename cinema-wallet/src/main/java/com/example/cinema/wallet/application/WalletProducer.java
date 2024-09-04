@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 @Consume.FromEventSourcedEntity(value = WalletEntity.class, ignoreUnknown = true)
 @Produce.ServiceStream(id = "wallet_events")
 @Acl(allow = @Acl.Matcher(service = "*"))
-public class WalletProducerAction extends Consumer {
+public class WalletProducer extends Consumer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

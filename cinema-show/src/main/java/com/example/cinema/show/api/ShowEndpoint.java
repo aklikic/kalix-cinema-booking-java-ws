@@ -24,7 +24,7 @@ public class ShowEndpoint {
     public ShowEndpoint(ComponentClient componentClient) {
         this.componentClient = componentClient;
     }
-    @Post
+    @Post("/{id}")
     public CompletionStage<ShowCommandResponse.Ack> createShow(String id, ShowCommand.CreateShow createShow) {
         logger.info("createShow: showId[{}], createShow[{}]",id, createShow);
         return componentClient.forEventSourcedEntity(id).method(ShowEntity::createShow).invokeAsync(createShow);

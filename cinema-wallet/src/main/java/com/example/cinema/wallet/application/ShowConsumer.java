@@ -29,12 +29,12 @@ public class ShowConsumer extends Consumer {
             case ShowPublicEvent.SeatReserved evt -> {
                 logger.info("onSeatReserved: [{}]",event);
                 var call = componentClient.forEventSourcedEntity(evt.walletId()).method(WalletEntity::chargeWallet).invokeAsync(new WalletCommand.ChargeWallet(evt.seatPrice(), evt.reservationId(), evt.showId())).thenApply(ack -> Done.done());
-                yield effects().acyncDone(call);
+                yield effects().asyncDone(call);
             }
             case ShowPublicEvent.SeatReservationCancelled evt -> {
                 logger.info("onSeatReservationCancelled: [{}]",event);
                 var call = componentClient.forEventSourcedEntity(evt.walletId()).method(WalletEntity::refundWalletCharge).invokeAsync(new WalletCommand.Refund(evt.reservationId(), evt.reservationCancellationId())).thenApply(ack -> Done.done());
-                yield effects().acyncDone(call);
+                yield effects().asyncDone(call);
             }
         };
     }

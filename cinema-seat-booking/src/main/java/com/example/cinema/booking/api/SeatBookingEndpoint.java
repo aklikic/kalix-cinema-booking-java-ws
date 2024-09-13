@@ -1,7 +1,8 @@
 package com.example.cinema.booking.api;
 
-import akka.javasdk.annotations.http.Endpoint;
+
 import akka.javasdk.annotations.http.Get;
+import akka.javasdk.annotations.http.HttpEndpoint;
 import akka.javasdk.annotations.http.Post;
 import akka.javasdk.client.ComponentClient;
 import com.example.cinema.booking.application.SeatBookingWorkflow;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletionStage;
 
-@Endpoint("/seat-booking")
+@HttpEndpoint("/seat-booking")
 public class SeatBookingEndpoint {
     private static final Logger logger = LoggerFactory.getLogger(SeatBookingEndpoint.class);
 

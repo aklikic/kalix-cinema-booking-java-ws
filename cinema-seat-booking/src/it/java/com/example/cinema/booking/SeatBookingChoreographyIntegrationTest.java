@@ -2,7 +2,7 @@ package com.example.cinema.booking;
 
 
 import akka.javasdk.http.HttpClientProvider;
-import akka.javasdk.testkit.AkkaSdkTestKitSupport;
+import akka.javasdk.testkit.TestKitSupport;
 import com.example.cinema.show.SeatStatus;
 import com.example.cinema.show.ShowClient;
 import com.example.cinema.show.ShowCommandError;
@@ -21,7 +21,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Disabled
-public class SeatBookingChoreographyIntegrationTest extends AkkaSdkTestKitSupport {
+public class SeatBookingChoreographyIntegrationTest extends TestKitSupport {
 
 
   private  WalletClient walletClient;

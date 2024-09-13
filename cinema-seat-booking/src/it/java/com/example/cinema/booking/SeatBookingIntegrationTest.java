@@ -3,7 +3,7 @@ package com.example.cinema.booking;
 
 import akka.javasdk.http.HttpClient;
 import akka.javasdk.http.HttpClientProvider;
-import akka.javasdk.testkit.AkkaSdkTestKitSupport;
+import akka.javasdk.testkit.TestKitSupport;
 import com.example.cinema.booking.api.SeatBookingCommandError;
 import com.example.cinema.booking.domain.SeatBookingState;
 import com.example.cinema.show.SeatStatus;
@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class SeatBookingIntegrationTest extends AkkaSdkTestKitSupport {
+public class SeatBookingIntegrationTest extends TestKitSupport {
 
   private static final Logger logger = LoggerFactory.getLogger(SeatBookingIntegrationTest.class);
   private SeatBookingClient seatBookingClient;

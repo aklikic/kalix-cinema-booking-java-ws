@@ -28,12 +28,12 @@ public class WalletConsumer extends Consumer {
             case WalletPublicEvent.WalletCharged evt -> {
                 logger.info("onWalletCharged: [{}]",evt);
                 var call = componentClient.forEventSourcedEntity(evt.showId()).method(ShowEntity::confirmSeatReservationPayment).invokeAsync(evt.expenseId()).thenApply(ack -> Done.done());
-                yield  effects().acyncDone(call);
+                yield  effects().asyncDone(call);
             }
             case WalletPublicEvent.WalletChargeRejected evt -> {
                 logger.info("onWalletChargeRejected: [{}]",event);
                 var call = componentClient.forEventSourcedEntity(evt.showId()).method(ShowEntity::cancelSeatReservation).invokeAsync(evt.expenseId()).thenApply(ack -> Done.done());;
-                yield  effects().acyncDone(call);
+                yield  effects().asyncDone(call);
             }
             default -> effects().done();
         };

@@ -32,15 +32,16 @@ public class SeatBookingIntegrationTest extends TestKitSupport {
   private  WalletClient walletClient;
   private  ShowClient showClient;
 
-    public SeatBookingIntegrationTest(HttpClientProvider httpClientProvider) throws Exception{
-        seatBookingClient = new SeatBookingClient(componentClient);
-        logger.info("httpClient show: {}",httpClientProvider.httpClientFor("cinema-show"));
-        logger.info("httpClient wallet: {}",httpClientProvider.httpClientFor("cinema-wallet"));
-        this.walletClient = new WalletClient(httpClientProvider.httpClientFor("cinema-wallet"));
-        this.showClient = new ShowClient(httpClientProvider.httpClientFor("cinema-show"));
-    }
-    private static final long timeoutSec = 10;
+  private static final long timeoutSec = 10;
 
+  public void beforeAll() {
+        super.beforeAll();
+        seatBookingClient = new SeatBookingClient(componentClient);
+        logger.info("httpClient show: {}",testKit.getHttpClientProvider().httpClientFor("cinema-show"));
+        logger.info("httpClient wallet: {}",testKit.getHttpClientProvider().httpClientFor("cinema-wallet"));
+        this.walletClient = new WalletClient(testKit.getHttpClientProvider().httpClientFor("cinema-wallet"));
+        this.showClient = new ShowClient(testKit.getHttpClientProvider().httpClientFor("cinema-show"));
+  }
     @Test
   public void shouldCompleteSeatReservation() throws Exception{
     //given

@@ -27,12 +27,14 @@ public class SeatBookingChoreographyIntegrationTest extends TestKitSupport {
   private  WalletClient walletClient;
   private  ShowClient showClient;
 
-    public SeatBookingChoreographyIntegrationTest(HttpClientProvider httpClientProvider) throws Exception{
-      this.walletClient = new WalletClient(httpClientProvider.httpClientFor("cinema-wallet"));
-      this.showClient = new ShowClient(httpClientProvider.httpClientFor("cinema-show"));
-    }
-    private static final Duration timeoutSec = Duration.of(10, SECONDS);
 
+  private static final Duration timeoutSec = Duration.of(10, SECONDS);
+
+  public void beforeAll() {
+    super.beforeAll();
+    this.walletClient = new WalletClient(testKit.getHttpClientProvider().httpClientFor("cinema-wallet"));
+    this.showClient = new ShowClient(testKit.getHttpClientProvider().httpClientFor("cinema-show"));
+  }
     @Test
   public void shouldCompleteSeatReservation() throws Exception{
     //given

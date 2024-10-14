@@ -41,7 +41,7 @@ public record SeatBookingState(String reservationId, String showId, int seatNumb
     public SeatBookingState asFailed(String reason) {
         if (status == SeatBookingStateStatus.WALLET_CHARGE_REJECTED || status == SeatBookingStateStatus.STARTED) {
             return asSeatBookingStateFailed(reason);
-        } else if (status == SeatBookingStateStatus.WALLET_REFUNDED) {
+        } else if (status == SeatBookingStateStatus.WALLET_REFUNDED || status == SeatBookingStateStatus.SEAT_RESERVED) {
             return asSeatBookingStateRefunded();
         } else {
             throw new IllegalStateException("not supported failed state transition from: " + status);

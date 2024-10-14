@@ -1,6 +1,7 @@
 package com.example.cinema.booking.api;
 
 
+import akka.javasdk.annotations.Acl;
 import akka.javasdk.annotations.http.Get;
 import akka.javasdk.annotations.http.HttpEndpoint;
 import akka.javasdk.annotations.http.Post;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletionStage;
 
+@Acl(allow = @Acl.Matcher(principal = Acl.Principal.ALL))
 @HttpEndpoint("/seat-booking")
 public class SeatBookingEndpoint {
     private static final Logger logger = LoggerFactory.getLogger(SeatBookingEndpoint.class);

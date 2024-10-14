@@ -9,14 +9,14 @@
     <groupId>com.example.cinema</groupId>
     <artifactId>cinema-wallet</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+<!--    <packaging>jar</packaging>-->
 
     <name>cinema-wallet</name>
     <properties>
         <!-- For Docker setup see https://docs.kalix.io/projects/container-registries.html -->
-        <container.registry>kcr.us-east1.kalix.dev</container.registry>
+        <container.registry>kcr.us-east-1.kalix.dev</container.registry>
         <organization>lightbend</organization>
-        <akka.javasdk.dev-mode.http-port>9001</akka.javasdk.dev-mode.http-port>
+<!--        <akka.javasdk.dev-mode.http-port>9001</akka.javasdk.dev-mode.http-port>-->
     </properties>
 
     <dependencies>

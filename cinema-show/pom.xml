@@ -14,9 +14,9 @@
     <name>cinema-show</name>
     <properties>
         <!-- For Docker setup see https://docs.kalix.io/projects/container-registries.html -->
-        <container.registry>kcr.us-east-1.kalix.io</container.registry>
-        <organization>lightbend-eng</organization>
-        <akka.javasdk.dev-mode.http-port>9000</akka.javasdk.dev-mode.http-port>
+        <container.registry>kcr.us-east-1.kalix.dev</container.registry>
+        <organization>lightbend</organization>
+<!--        <akka.javasdk.dev-mode.http-port>9000</akka.javasdk.dev-mode.http-port>-->
     </properties>
 
     <dependencies>

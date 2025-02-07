@@ -19,7 +19,7 @@ mvn test
 ## Integration tests
 in each Maven module/project (`cinema-wallet`, `cinema-show`) (<b>excluding</b> `cinema-seat-booking`) run:
 ```shell
-mvn -Pit verify
+mvn verify
 ```
 ### Multi-project integration test
 in each Maven module/project (`cinema-wallet`, `cinema-show`) (<b>excluding</b> `cinema-seat-booking`) run:
@@ -28,7 +28,7 @@ mvn exec:java
 ```
 Run `cinema-seat-booking` Maven project:
 ```shell
-mvn -Pit verify
+mvn verify
 ```
 
 # Run locally
@@ -81,15 +81,29 @@ curl -XGET http://localhost:9002/seat-booking/res1 -H "Content-Type: application
 # Deploy
 ## Configure KCR (Kalix Container Registry)
 https://docs.kalix.io/operations/container-registries.html#_kalix_container_registry
-
-## Push image to KCR and deploy
-In each Maven module/project (`cinema-wallet`, `cinema-show`, `cinema-seat-booking`) configure these properties in `pom.xml` (`container.registry`, `organization`) and run:
+## Build images
+In project root:
 ```shell
-mvn deploy
+mvn install -DskipTests
 ```
-Copy the image URL and deploy service to Kalix:
+### Check local build images:
 ```shell
-kalix service deploy --with-embedded-runtime <service name> <pushed image url>
+docker images | grep -v latest | head -4
+```
+## Deploy each service (with image push)
+In each module execute
+```shell
+akka service deploy <service name> <service name>:tag --push
+```
+### Example:
+```shell
+akka service deploy cinema-wallet cinema-wallet:1.0-SNAPSHOT-20250128094523 --push
+```
+```shell
+akka service deploy cinema-show cinema-show:1.0-SNAPSHOT-20250116090616 --push
+```
+```shell
+akka service deploy cinema-util cinema-util:1.0-SNAPSHOT-20250116090616 --push
 ```
 # Demo (test) in Cloud runtime
 ## Set proxies:
@@ -104,3 +118,7 @@ kalix service proxy cinema-seat-booking --port 9002
 ```
 ### Test (demo)
 Run the same commands as with local test.
+
+
+
+

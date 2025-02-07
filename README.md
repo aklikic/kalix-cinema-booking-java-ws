@@ -1,77 +1,43 @@
 # Prerequisites 
-- Java 17 or higher
+- Java 21 or higher
 - Apache Maven
 - Docker 20.10.14 or higher (build images, docker-compose)
 - [Kalix CLI](https://docs.kalix.io/kalix/install-kalix.html) (required only for a local console run and managing service on Kalix Cloud runtime)
 
-# How to use this repo
-
-## Run and play with the code
-Skip to [Local test](#local-test)<br>
-
-## Developer Experience 
-Use this repo as a reference implementation and use [Create kickstart maven project](#create-kickstart-maven-project) for kickstarting your own project.
-
-# Create kickstart maven project
-```
-mvn archetype:generate \
-  -DarchetypeGroupId=io.kalix \
-  -DarchetypeArtifactId=kalix-spring-boot-archetype \
-  -DarchetypeVersion=1.4.1
-```
-Define value for property 'groupId': `com.example`<br>
-Define value for property 'artifactId': `cinema-seat-booking`<br>
-Define value for property 'version' 1.0-SNAPSHOT: :<br>
-Define value for property 'package' com.example: : `com.example.cinema.booking`<br>
-
-# Setup
-## Dependencies
-```
-    <dependency>
-      <groupId>com.example.cinema</groupId>
-      <artifactId>cinema-wallet-api</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.example.cinema</groupId>
-      <artifactId>cinema-show-api</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.awaitility</groupId>
-      <artifactId>awaitility</artifactId>
-      <version>4.2.0</version>
-      <scope>test</scope>
-    </dependency>
-```
-## Discovery
-application.conf
-```
-kalix.dev-mode.service-port-mappings.cinema-show="localhost:9000"
-kalix.dev-mode.service-port-mappings.cinema-wallet="localhost:9001"
-```
-docker-compose:
-```
--Dkalix.dev-mode.service-port-mappings.cinema-show=host.docker.internal:9000
--Dkalix.dev-mode.service-port-mappings.cinema-wallet=host.docker.internal:9001
-```
-
-# Run
-Orchestration:
-Run:
+# Build 
+In root Maven project (mono repo root) run:
 ```shell
-mvn kalix:runAll
+mvn install
 ```
-
-Choreography:
-Run:
+## Testing
+# Unit tests
+in each Maven module/project (`cinema-wallet`, `cinema-show`, `cinema-seat-booking`) run:
 ```shell
-mvn -Dspring.profiles.active=choreography kalix:runAll
+mvn test
 ```
 
-# Local test
+## Integration tests
+in each Maven module/project (`cinema-wallet`, `cinema-show`) (<b>excluding</b> `cinema-seat-booking`) run:
+```shell
+mvn verify
+```
+### Multi-project integration test
+in each Maven module/project (`cinema-wallet`, `cinema-show`) (<b>excluding</b> `cinema-seat-booking`) run:
+```shell
+mvn exec:java
+```
+Run `cinema-seat-booking` Maven project:
+```shell
+mvn verify
+```
+
+# Run locally
+in each Maven module/project (`cinema-wallet`, `cinema-show`, `cinema-seat-booking`) run: 
+```shell
+mvn exec:java
+```
+
+# Demo (test) locally
 Create show:
 ```shell
 curl -XPOST -d '{
@@ -99,8 +65,6 @@ Get wallet:
 curl -XGET http://localhost:9001/wallet/1 -H "Content-Type: application/json"
 ```
 
-## Orchestration
-
 Start seat booking:
 ```shell
 curl -XPOST -d '{
@@ -114,24 +78,35 @@ Get seat reservation state:
 curl -XGET http://localhost:9002/seat-booking/res1 -H "Content-Type: application/json"
 ```
 
-
-## Choreography
-Reserve a seat:
-```shell
-curl -XPATCH -v -d '{
-  "walletId": "1",
-  "reservationId": "res456789",
-  "seatNumber": "1"
-}' http://localhost:9000/cinema-show/1/reserve -H "Content-Type: application/json"
-```
-
 # Deploy
+## Configure KCR (Kalix Container Registry)
+https://docs.kalix.io/operations/container-registries.html#_kalix_container_registry
+## Build images
+In project root:
 ```shell
-mvn deploy kalix:deploy
+mvn install -DskipTests
 ```
-
-# Test in Cloud runtime
-Set proxies:
+### Check local build images:
+```shell
+docker images | grep -v latest | head -4
+```
+## Deploy each service (with image push)
+In each module execute
+```shell
+akka service deploy <service name> <service name>:tag --push
+```
+### Example:
+```shell
+akka service deploy cinema-wallet cinema-wallet:1.0-SNAPSHOT-20250128094523 --push
+```
+```shell
+akka service deploy cinema-show cinema-show:1.0-SNAPSHOT-20250116090616 --push
+```
+```shell
+akka service deploy cinema-util cinema-util:1.0-SNAPSHOT-20250116090616 --push
+```
+# Demo (test) in Cloud runtime
+## Set proxies:
 ```shell
 kalix service proxy cinema-show --port 9000
 ```
@@ -141,3 +116,9 @@ kalix service proxy cinema-wallet --port 9001
 ```shell
 kalix service proxy cinema-seat-booking --port 9002
 ```
+### Test (demo)
+Run the same commands as with local test.
+
+
+
+

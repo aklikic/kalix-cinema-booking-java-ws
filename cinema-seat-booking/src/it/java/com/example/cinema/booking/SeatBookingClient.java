@@ -1,11 +1,12 @@
 package com.example.cinema.booking;
 
-import kalix.javasdk.client.ComponentClient;
-import org.springframework.stereotype.Component;
+import akka.javasdk.client.ComponentClient;
+import com.example.cinema.booking.api.SeatBookingCommand;
+import com.example.cinema.booking.api.SeatBookingCommandResponse;
+import com.example.cinema.booking.application.SeatBookingWorkflow;
 
 import java.util.concurrent.CompletionStage;
 
-@Component
 public class SeatBookingClient {
 
     private final ComponentClient componentClient;
@@ -16,14 +17,13 @@ public class SeatBookingClient {
 
     public CompletionStage<SeatBookingCommandResponse> start(String reservationId, String showId, int seatNumber, String walletId) {
         return componentClient.forWorkflow(reservationId)
-                .call(SeatBookingWorkflow::start)
-                .params(new SeatBookingCommand(showId,seatNumber,walletId))
-                .execute();
+                .method(SeatBookingWorkflow::start)
+                .invokeAsync(new SeatBookingCommand(showId,seatNumber,walletId));
     }
     public CompletionStage<SeatBookingCommandResponse> get(String reservationId) {
         return componentClient.forWorkflow(reservationId)
-                .call(SeatBookingWorkflow::getState)
-                .execute();
+                .method(SeatBookingWorkflow::getState)
+                .invokeAsync();
     }
 
 }

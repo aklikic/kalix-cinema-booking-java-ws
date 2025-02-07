@@ -1,49 +1,47 @@
 package com.example.cinema.booking;
 
 
+import akka.javasdk.http.HttpClient;
+import akka.javasdk.http.HttpClientProvider;
+import akka.javasdk.testkit.TestKitSupport;
+import com.example.cinema.booking.api.SeatBookingCommandError;
+import com.example.cinema.booking.domain.SeatBookingState;
 import com.example.cinema.show.SeatStatus;
 import com.example.cinema.show.ShowClient;
 import com.example.cinema.show.ShowCommandError;
 import com.example.cinema.wallet.WalletClient;
 import com.example.cinema.wallet.WalletCommandError;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import kalix.spring.WebClientProvider;
-import kalix.spring.testkit.KalixIntegrationTestKitSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.*;
+import org.awaitility.Awaitility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
+public class SeatBookingIntegrationTest extends TestKitSupport {
 
-@SpringBootTest(classes = Main.class)
-public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
-
-  @Autowired
+  private static final Logger logger = LoggerFactory.getLogger(SeatBookingIntegrationTest.class);
   private SeatBookingClient seatBookingClient;
 
   private  WalletClient walletClient;
   private  ShowClient showClient;
 
-    public SeatBookingIntegrationTest() throws Exception{
-        var config = ConfigFactory.load();
-        this.walletClient = new WalletClient(getWebClient(config,"cinema-wallet"));
-        this.showClient = new ShowClient(getWebClient(config,"cinema-show"));
-    }
-    private static final long timeoutSec = 10;
+  private static final long timeoutSec = 10;
 
+  public void beforeAll() {
+        super.beforeAll();
+        seatBookingClient = new SeatBookingClient(componentClient);
+        logger.info("httpClient show: {}",testKit.getHttpClientProvider().httpClientFor("cinema-show"));
+        logger.info("httpClient wallet: {}",testKit.getHttpClientProvider().httpClientFor("cinema-wallet"));
+        this.walletClient = new WalletClient(testKit.getHttpClientProvider().httpClientFor("cinema-wallet"));
+        this.showClient = new ShowClient(testKit.getHttpClientProvider().httpClientFor("cinema-show"));
+  }
     @Test
   public void shouldCompleteSeatReservation() throws Exception{
     //given
@@ -66,7 +64,7 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
     assertEquals(SeatBookingCommandError.NO_ERROR,bookSeatRes.error());
 
     //then
-      await()
+      Awaitility.await()
         .atMost(10, TimeUnit.of(SECONDS))
         .ignoreExceptions()
         .untilAsserted(() -> {
@@ -103,7 +101,7 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
         assertEquals(SeatBookingCommandError.NO_ERROR,bookSeatRes.error());
 
         //then
-        await()
+        Awaitility.await()
                 .atMost(10, TimeUnit.of(SECONDS))
                 .ignoreExceptions()
                 .untilAsserted(() -> {
@@ -120,9 +118,5 @@ public class SeatBookingIntegrationTest extends KalixIntegrationTestKitSupport {
                 });
     }
 
-    private WebClient getWebClient(Config config, String serviceName){
-        var mapping = config.getString("kalix.dev-mode.service-port-mappings."+serviceName);
-        return WebClient.create("http://" + mapping);
-    }
 
 }

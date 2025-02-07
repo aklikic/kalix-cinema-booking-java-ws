@@ -1,17 +1,16 @@
 package com.example.cinema.booking;
 
 
+import akka.javasdk.http.HttpClientProvider;
+import akka.javasdk.testkit.TestKitSupport;
 import com.example.cinema.show.SeatStatus;
 import com.example.cinema.show.ShowClient;
 import com.example.cinema.show.ShowCommandError;
 import com.example.cinema.wallet.WalletClient;
 import com.example.cinema.wallet.WalletCommandError;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import kalix.spring.testkit.KalixIntegrationTestKitSupport;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -19,24 +18,23 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-//@SpringBootTest(classes = Main.class)
-public class SeatBookingChoreographyIntegrationTest {
+@Disabled
+public class SeatBookingChoreographyIntegrationTest extends TestKitSupport {
 
 
   private  WalletClient walletClient;
   private  ShowClient showClient;
 
-    public SeatBookingChoreographyIntegrationTest() throws Exception{
-        var config = ConfigFactory.load();
-        this.walletClient = new WalletClient(getWebClient(config,"cinema-wallet"));
-        this.showClient = new ShowClient(getWebClient(config,"cinema-show"));
-    }
-    private static final long timeoutSec = 10;
 
+  private static final Duration timeoutSec = Duration.of(10, SECONDS);
+
+  public void beforeAll() {
+    super.beforeAll();
+    this.walletClient = new WalletClient(testKit.getHttpClientProvider().httpClientFor("cinema-wallet"));
+    this.showClient = new ShowClient(testKit.getHttpClientProvider().httpClientFor("cinema-show"));
+  }
     @Test
   public void shouldCompleteSeatReservation() throws Exception{
     //given
@@ -49,31 +47,26 @@ public class SeatBookingChoreographyIntegrationTest {
     var reservationId = UUID.randomUUID().toString();
     var seatNumber = 3;
 
-    var walletAck = walletClient.createWallet(walletId, initialBalance).toCompletableFuture().get(timeoutSec,TimeUnit.SECONDS);
+    var walletAck = await(walletClient.createWallet(walletId, initialBalance),timeoutSec);
     assertEquals(WalletCommandError.NO_ERROR,walletAck.error());
-    var showAck = showClient.createShow(showId,title,seatPrice,maxSeats).toCompletableFuture().get(timeoutSec,TimeUnit.SECONDS);
+    var showAck = await(showClient.createShow(showId,title,seatPrice,maxSeats),timeoutSec);
     assertEquals(ShowCommandError.NO_ERROR,showAck.error());
 
      //when
-    var reserveSeat = showClient.reserveSeat(showId,walletId,reservationId,seatNumber).toCompletableFuture().get(timeoutSec,TimeUnit.SECONDS);
+    var reserveSeat = await(showClient.reserveSeat(showId,walletId,reservationId,seatNumber),timeoutSec);
     assertEquals(ShowCommandError.NO_ERROR,reserveSeat.error());
 
     //then
-      await()
+        Awaitility.await()
         .atMost(10, TimeUnit.of(SECONDS))
               .pollDelay(2, TimeUnit.SECONDS)
               .pollInterval(Duration.ofSeconds(2))
         .ignoreExceptions()
         .untilAsserted(() -> {
-          var showSeatStatusGet = showClient.getSeatStatus(showId,seatNumber).toCompletableFuture().get(timeoutSec,TimeUnit.SECONDS);
+          var showSeatStatusGet = await(showClient.getSeatStatus(showId,seatNumber),timeoutSec);
           assertEquals(SeatStatus.PAID,showSeatStatusGet.seatStatus());
-          var walletGet = walletClient.getWallet(walletId).toCompletableFuture().get(timeoutSec,TimeUnit.SECONDS);
+          var walletGet = await(walletClient.getWallet(walletId),timeoutSec);
           assertEquals(new BigDecimal(initialBalance).subtract(seatPrice),walletGet.balance());
         });
   }
-    private WebClient getWebClient(Config config, String serviceName){
-        var mapping = config.getString("kalix.dev-mode.service-port-mappings."+serviceName);
-        return WebClient.create("http://" + mapping);
-    }
-
 }

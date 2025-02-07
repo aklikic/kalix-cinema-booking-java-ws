@@ -1,47 +1,48 @@
 package com.example.cinema.wallet;
 
-import kalix.spring.WebClientProvider;
-import org.springframework.web.reactive.function.client.WebClient;
+
+import akka.javasdk.http.HttpClient;
+import akka.javasdk.http.StrictResponse;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CompletionStage;
 
 public class WalletClient {
 
-    final private WebClient webClient;
+    final private HttpClient httpClient;
 
-    public WalletClient(WebClient webClient) {
-        this.webClient = webClient;
+    public WalletClient(HttpClient webClient) {
+        this.httpClient = webClient;
     }
 
     public CompletionStage<WalletCommandResponse.Ack> createWallet(String walletId, int initialBalance) {
-        return webClient.post().uri("/wallet/" + walletId + "/create/" + initialBalance)
-                .retrieve()
-                .bodyToMono(WalletCommandResponse.Ack.class)
-                .toFuture();
+        return httpClient.POST("/wallet/" + walletId + "/create/" + initialBalance)
+                .responseBodyAs(WalletCommandResponse.Ack.class)
+                .invokeAsync()
+                .thenApply(StrictResponse::body);
     }
 
 
     public CompletionStage<WalletCommandResponse.Ack> chargeWallet(String walletId, BigDecimal amount, String expenseId, String showId) {
-        return webClient.patch().uri("/wallet/" + walletId + "/charge")
-                .bodyValue(new WalletCommand.ChargeWallet(amount,expenseId,showId))
-                .retrieve()
-                .bodyToMono(WalletCommandResponse.Ack.class)
-                .toFuture();
+        return httpClient.PATCH("/wallet/" + walletId + "/charge")
+                .withRequestBody(new WalletCommand.ChargeWallet(amount,expenseId,showId))
+                .responseBodyAs(WalletCommandResponse.Ack.class)
+                .invokeAsync()
+                .thenApply(StrictResponse::body);
     }
 
     public CompletionStage<WalletCommandResponse.Ack> refundWalletCharge(String walletId, String chargeExpenseId, String refundExpenseId) {
-        return webClient.patch().uri("/wallet/" + walletId + "/refund")
-                .bodyValue(new WalletCommand.Refund(chargeExpenseId,refundExpenseId))
-                .retrieve()
-                .bodyToMono(WalletCommandResponse.Ack.class)
-                .toFuture();
+        return httpClient.PATCH("/wallet/" + walletId + "/refund")
+                .withRequestBody(new WalletCommand.Refund(chargeExpenseId,refundExpenseId))
+                .responseBodyAs(WalletCommandResponse.Ack.class)
+                .invokeAsync()
+                .thenApply(StrictResponse::body);
     }
 
     public CompletionStage<WalletCommandResponse.WalletCommandSummeryResponse> getWallet(String walletId) {
-        return webClient.get().uri("/wallet/" + walletId)
-                .retrieve()
-                .bodyToMono(WalletCommandResponse.WalletCommandSummeryResponse.class)
-                .toFuture();
+        return httpClient.GET("/wallet/" + walletId)
+                .responseBodyAs(WalletCommandResponse.WalletCommandSummeryResponse.class)
+                .invokeAsync()
+                .thenApply(StrictResponse::body);
     }
 }
